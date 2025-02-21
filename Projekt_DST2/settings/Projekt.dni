@@ -25,7 +25,7 @@ TypeViolation=1
 UnspecRange=1
 ActionState=1
 [DebugChecksum]
-Checksum=1583474892
+Checksum=-36569514
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -43,15 +43,11 @@ ShowSource=1
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.236.13" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\exceptions.c}.145.2" 0 0 1 "" 0 "" 0
-Bp2=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.106.3" 0 0 1 "" 0 "" 0
-Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.377.7" 0 0 1 "" 0 "" 0
-Bp4=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.212.3" 0 0 1 "" 0 "" 0
-Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.89.3" 0 0 1 "" 0 "" 0
-Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.128.3" 0 0 1 "" 0 "" 0
-Bp7=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.201.5" 0 0 1 "" 0 "" 0
-Count=8
+Bp0=_ 0 "EMUL_CODE" "{C:\Users\elijov23\repos\DST2}.145.2" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.379.7" 0 0 1 "" 0 "" 0
+Bp2=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.226.14" 0 0 1 "" 0 "" 0
+Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.106.3" 0 0 1 "" 0 "" 0
+Count=4
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""

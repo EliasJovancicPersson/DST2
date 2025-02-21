@@ -337,10 +337,12 @@ int receive_no_wait(mailbox* mBox, void* pData) {
 exception wait(uint nTicks) {
     isr_off();
     PreviousTask = NextTask;
-    list_insert_sort(TimerList, list_remove_head(ReadyList),cmp_tcb_priority);
-    uint currDeadline = NextTask->Deadline;
-    set_deadline(currDeadline+nTicks);
-    NextTask = ReadyList->pHead ? ReadyList->pHead->pTask : NULL;
+    listobj* node = list_remove_head(ReadyList);
+    node->nTCnt = nTicks + ticks();
+    list_insert_sort(TimerList, node,cmp_tcb_priority);
+    
+    NextTask = ReadyList->pHead->pTask;
+    
     SwitchContext();
     if (PreviousTask->Deadline <= Ticks) {
         return DEADLINE_REACHED;
@@ -373,7 +375,7 @@ void set_deadline(uint deadline) {
 
 void TimerInt(void) {
     Ticks++;
-    if(Ticks == 1000){
+    if(Ticks == 3900){
       asm("nop");
     }
     listobj *node = TimerList->pHead;
@@ -389,10 +391,10 @@ void TimerInt(void) {
     
     listobj *node1 = WaitingList->pHead;
     while (node1 != NULL) {
-        if (node1->pTask->Deadline <= Ticks) {
+        if (node1->pTask->Deadline <= Ticks || node1->nTCnt >= Ticks) {
             list_insert_head(ReadyList, node1->pTask);
             PreviousTask = NextTask;
-            NextTask = node->pTask;
+            NextTask = node1->pTask;
             list_remove_head(WaitingList);
         }
         node1 = node1->pNext;

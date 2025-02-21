@@ -686,7 +686,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>C:\Users\elijov23\Desktop\Projekt_DST2\sam3x8-sram_BigHeap.icf</state>
+          <state>C:\Users\elijov23\repos\DST2\Projekt_DST2\sam3x8-sram_BigHeap.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>

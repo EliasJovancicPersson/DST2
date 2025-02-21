@@ -2,7 +2,7 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>3022860831</fileChecksum>
+  <fileChecksum>3360019338</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs>
@@ -68,6 +68,7 @@
       <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
       <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
       <file>$PROJ_DIR$\Debug\Obj\cstartup.o</file>
+      <file>$PROJ_DIR$\..\..\..\Desktop\Projekt_DST2\linkedList.c</file>
     </outputs>
     <file>
       <name>$PROJ_DIR$\linkedList.c</name>
@@ -154,6 +155,10 @@
         <tool>
           <name>ICCARM</name>
           <file> 9 8 42 26 59 30 25 57 18 37 29 51 36 58</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 9 8 42 26 59 30 57 18 37 29 51 36 58</file>
         </tool>
       </inputs>
     </file>
