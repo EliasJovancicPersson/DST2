@@ -67,6 +67,7 @@ exception create_task(void (*task_body)(), uint deadline) {
     new_tcb->PC = task_body;
     new_tcb->SP = &(new_tcb->StackSeg [STACK_SIZE - 9]);
     new_tcb->SPSR = 0x21000000;  // Default processor status register value
+
   
 
     /* Initialize Stack */
@@ -79,6 +80,7 @@ exception create_task(void (*task_body)(), uint deadline) {
     }
     node->pNext = node->pPrevious = NULL;
     node->pTask = new_tcb;
+    node->nTCnt = 0;
     
     /* Insert into ReadyList */
     if (KernelMode == INIT) {
@@ -164,6 +166,7 @@ exception send_wait(mailbox* mBox, void* pData) {
     if (mBox->pHead) {
         memcpy(mBox->pHead->pData, pData, mBox->nDataSize);
         msg *receivedMsg = mailbox_remove_head(mBox);
+        mBox->nBlockedMsg--;
         free(receivedMsg);
 
         // Move the receiving task to the ReadyList
@@ -171,38 +174,36 @@ exception send_wait(mailbox* mBox, void* pData) {
         listobj *WaitHead = list_remove_head(WaitingList);
         list_insert_sort(ReadyList, WaitHead,cmp_tcb_priority);
         NextTask = ReadyList->pHead->pTask;
-        SwitchContext();
-
-        isr_on();
-        return OK;
+    }else{
+        // No receiver -> Block sender
+      msg* newMsg = (msg*)malloc(sizeof(msg));
+      if (!newMsg) {
+          return FAIL;
+      }
+  
+      newMsg->pData = malloc(mBox->nDataSize);
+      if (!newMsg->pData) {
+          free(newMsg);
+          return FAIL;
+      }
+      newMsg->Status = SENDER;
+  
+      newMsg->pBlock = ReadyList->pHead;
+      
+      memcpy(newMsg->pData, pData, mBox->nDataSize);
+      
+      mailbox_insert_tail(mBox, newMsg);
+      mBox->nBlockedMsg++;
+  
+      // Move sender task to `WaitingList` (Blocking it)
+      PreviousTask = NextTask;
+      listobj *node = list_remove_head(ReadyList);
+      list_insert_sort(WaitingList, node, cmp_tcb_priority);
+  
+      NextTask = ReadyList->pHead->pTask;
     }
 
-    // No receiver -> Block sender
-    msg* newMsg = (msg*)malloc(sizeof(msg));
-    if (!newMsg) {
-        isr_on();
-        return FAIL;
-    }
-
-    newMsg->pData = malloc(mBox->nDataSize);
-    if (!newMsg->pData) {
-        free(newMsg);
-        isr_on();
-        return FAIL;
-    }
-    newMsg->Status = SENDER; // WE ARE HERE
-
-    memcpy(newMsg->pData, pData, mBox->nDataSize);
-    mailbox_insert_tail(mBox, newMsg);
-    mBox->nMessages++;
-    mBox->nBlockedMsg++;
-
-    // Move sender task to `WaitingList` (Blocking it)
-    PreviousTask = NextTask;
-    list_insert_sort(WaitingList, list_remove_head(ReadyList), cmp_tcb_priority);
-    NextTask = ReadyList->pHead->pTask;
-    
-    SwitchContext();
+    SwitchContext(); //for some reason we get tb5 in both lists her
 
     // If the task remains blocked until its deadline is reached
     if (PreviousTask->Deadline <= Ticks) {
@@ -211,10 +212,9 @@ exception send_wait(mailbox* mBox, void* pData) {
         free(expiredMsg);
         isr_on();
         return DEADLINE_REACHED;
+    }else{
+        return OK;
     }
-
-    isr_on();
-    return OK;
 }
 
 
@@ -232,9 +232,10 @@ exception receive_wait(mailbox* mBox, void* pData) {
         memcpy(pData, receivedMsg->pData, mBox->nDataSize);
 
         if(mBox->nBlockedMsg > 0) {
-            PreviousTask = receivedMsg->pBlock->pTask;
+            PreviousTask = NextTask;
             list_insert_sort(ReadyList, receivedMsg->pBlock, cmp_tcb_priority);
             NextTask = ReadyList->pHead->pTask;
+            mBox->nBlockedMsg--;
         } else {
             free(receivedMsg->pData);
             free(receivedMsg);
@@ -254,6 +255,7 @@ exception receive_wait(mailbox* mBox, void* pData) {
         }
         
         newMsg->Status = RECEIVER;
+        newMsg->pBlock = ReadyList->pHead;
 
         mailbox_insert_tail(mBox, newMsg);
         PreviousTask = NextTask;
@@ -274,11 +276,8 @@ exception receive_wait(mailbox* mBox, void* pData) {
         isr_on();
         return DEADLINE_REACHED;
     }
-    isr_on();
     return OK;
 }
-
-
 
 exception send_no_wait(mailbox *mBox, void *pData) {
     isr_off();
@@ -344,7 +343,7 @@ exception wait(uint nTicks) {
     NextTask = ReadyList->pHead->pTask;
     
     SwitchContext();
-    if (PreviousTask->Deadline <= Ticks) {
+    if (PreviousTask->Deadline <= ticks()) {
         return DEADLINE_REACHED;
     }
     return OK;
@@ -375,28 +374,32 @@ void set_deadline(uint deadline) {
 
 void TimerInt(void) {
     Ticks++;
-    if(Ticks == 3900){
-      asm("nop");
-    }
-    listobj *node = TimerList->pHead;
-    while (node != NULL) {
-        if (node->pTask->Deadline <= Ticks) {
-            list_insert_head(ReadyList, node->pTask);
-            PreviousTask = NextTask;
-            NextTask = node->pTask;
-            list_remove_head(TimerList);
-        }
-        node = node->pNext;
+    if (Ticks == 4000) {
+        asm("nop");
     }
     
-    listobj *node1 = WaitingList->pHead;
-    while (node1 != NULL) {
-        if (node1->pTask->Deadline <= Ticks || node1->nTCnt >= Ticks) {
-            list_insert_head(ReadyList, node1->pTask);
+    // Iterate through TimerList to find eligible nodes.
+    listobj *node = TimerList->pHead;
+    while (node != NULL) {
+        listobj *next = node->pNext;  // Save next pointer before unlinking.
+        if (node->pTask->Deadline <= Ticks || node->nTCnt <= Ticks) {
+            // Unlink the node from TimerList without freeing it.
+            node = list_unlink_node(TimerList, node);
+            // Insert the node into ReadyList (using sorted insertion if desired).
+            list_insert_sort(ReadyList, node, cmp_tcb_priority);
             PreviousTask = NextTask;
-            NextTask = node1->pTask;
-            list_remove_head(WaitingList);
+            NextTask = node->pTask;
         }
-        node1 = node1->pNext;
+        node = next;
+    }
+    
+    // Process WaitingList (which is sorted by deadline, so only the head is checked).
+    while (WaitingList->pHead != NULL &&
+           WaitingList->pHead->pTask->Deadline <= Ticks) {
+        listobj *wnode = list_remove_head(WaitingList);
+        list_insert_sort(ReadyList, wnode, cmp_tcb_priority);
+        PreviousTask = NextTask;
+        NextTask = wnode->pTask;
     }
 }
+

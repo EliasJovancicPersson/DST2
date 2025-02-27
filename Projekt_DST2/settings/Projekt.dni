@@ -25,7 +25,7 @@ TypeViolation=1
 UnspecRange=1
 ActionState=1
 [DebugChecksum]
-Checksum=-36569514
+Checksum=-1868335077
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -44,10 +44,21 @@ ShowSource=1
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{C:\Users\elijov23\repos\DST2}.145.2" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.379.7" 0 0 1 "" 0 "" 0
-Bp2=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.226.14" 0 0 1 "" 0 "" 0
-Bp3=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.106.3" 0 0 1 "" 0 "" 0
-Count=4
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..}.145.2" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.155.3" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.143.3" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.137.3" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.140.3" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.109.3" 0 0 1 "" 0 "" 0
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.137.3" 0 0 1 "" 0 "" 0
+Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.152.3" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.155.3" 0 0 1 "" 0 "" 0
+Bp10=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\..\..\WINDOWS\system32}.153.3" 0 0 1 "" 0 "" 0
+Bp11=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.156.3" 0 0 1 "" 0 "" 0
+Bp12=_ 1 "EMUL_CODE" "{$PROJ_DIR$\main.c}.158.3" 0 0 1 "" 0 "" 0
+Bp13=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.201.7" 0 0 1 "" 0 "" 0
+Bp14=_ 1 "EMUL_CODE" "{$PROJ_DIR$\kernel_functions.c}.200.16" 0 0 1 "" 0 "" 0
+Count=15
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -56,10 +67,11 @@ Category=_ 0
 LoggingEnabled=_ 0
 LogFile=_ ""
 [Aliases]
-A0=_ "H:\Projekt_DST2\compare.c" "C:\Users\elijov23\Desktop\Projekt_DST2\compare.c"
-A1=_ "H:\Projekt_DST2\main.c" "C:\Users\elijov23\Desktop\Projekt_DST2\main.c"
-A2=_ "H:\Projekt_DST2\startup_sam3x.c" "C:\Users\elijov23\Desktop\Projekt_DST2\startup_sam3x.c"
-Count=3
+A0=_ "C:\Users\elijov23\Desktop\Projekt_DST2\main.c" "C:\Users\elijov23\repos\DST2\Projekt_DST2\main.c"
+A1=_ "H:\Projekt_DST2\compare.c" "C:\Users\elijov23\Desktop\Projekt_DST2\compare.c"
+A2=_ "H:\Projekt_DST2\main.c" "C:\Users\elijov23\Desktop\Projekt_DST2\main.c"
+A3=_ "H:\Projekt_DST2\startup_sam3x.c" "C:\Users\elijov23\Desktop\Projekt_DST2\startup_sam3x.c"
+Count=4
 SuppressDialog=1
 [CallStackLog]
 Enabled=0

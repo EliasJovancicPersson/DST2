@@ -33,7 +33,7 @@ int list_insert_tail(list *lst, void *data);
 /* Inserts a new TCB or msg pointer at the head of the list.
    Returns 1 on success.
 */
-int list_insert_head(list *lst, void *data);
+int list_insert_head(list *lst, listobj *data);
 
 /* Removes the head node from the list and returns its stored TCB or msg pointer.
    (Used by run() to extract the next task or message.)
@@ -53,5 +53,7 @@ listobj *list_first(list *lst);
 
 /* Returns the next node after the given node.*/
 listobj *list_next(listobj *node);
+
+listobj *list_unlink_node(list *lst, listobj *node);
 
 #endif /* LINKEDLIST_H */

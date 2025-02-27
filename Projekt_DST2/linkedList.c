@@ -25,15 +25,6 @@ int list_insert_sort(list *lst, listobj *node, int (*cmp)(const void *, const vo
     if (!lst || !cmp)
         return 0;
 
-   /* listobj *node = (listobj *)malloc(sizeof(listobj));
-    if (!node)
-        return 0;
-
-    node->pTask = (TCB *)data;
-    node->pMessage = (msg *)data;
-    node->pPrevious = node->pNext = NULL;
-    */
-    
     if (lst->pHead == NULL && lst->pTail == NULL) {
         lst->pHead = lst->pTail = node;
         return 1;
@@ -90,28 +81,54 @@ int list_insert_tail(list *lst, void *data) {
     return 1;
 }
 
-int list_insert_head(list *lst, void *data) {
+int list_insert_head(list *lst, listobj *data) {
     if (!lst)
         return 0;
     
-    listobj *node = (listobj *) malloc(sizeof(listobj));
+    // Allocate memory for a new node.
+    listobj *node = malloc(sizeof(listobj));
     if (!node)
         return 0;
 
-    node->pTask = (TCB *)data;
-    node->pMessage = (msg *)data;
+    // Copy the contents of *data into the newly allocated node.
+    *node = *data;  
+    // Initialize the pointers of the new node.
     node->pPrevious = NULL;
     node->pNext = lst->pHead;
     
+    // Link the old head's previous pointer to the new node.
     if (lst->pHead)
         lst->pHead->pPrevious = node;
     else
+        // If the list was empty, new node is also the tail.
         lst->pTail = node;
 
+    // Set the new node as the head of the list.
     lst->pHead = node;
 
     return 1;
 }
+
+// Removes a node from the list without freeing its memory.
+listobj *list_unlink_node(list *lst, listobj *node) {
+    if (!lst || !node)
+        return NULL;
+    
+    if (node->pPrevious)
+        node->pPrevious->pNext = node->pNext;
+    else
+        lst->pHead = node->pNext;
+
+    if (node->pNext)
+        node->pNext->pPrevious = node->pPrevious;
+    else
+        lst->pTail = node->pPrevious;
+
+    // Clear the node's pointers so it can be safely reinserted.
+    node->pNext = node->pPrevious = NULL;
+    return node;
+}
+
 
 listobj *list_remove_head(list *lst) {
   
