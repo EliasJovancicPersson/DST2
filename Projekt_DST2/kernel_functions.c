@@ -163,7 +163,7 @@ exception send_wait(mailbox* mBox, void* pData) {
     isr_off();
 
     // If a receiver is waiting, deliver the message immediately
-    if (mBox->pHead) {
+    if (mBox->pHead && mBox->pHead->Status == RECEIVER) {
         memcpy(mBox->pHead->pData, pData, mBox->nDataSize);
         msg *receivedMsg = mailbox_remove_head(mBox);
         mBox->nBlockedMsg--;
@@ -202,11 +202,10 @@ exception send_wait(mailbox* mBox, void* pData) {
   
       NextTask = ReadyList->pHead->pTask;
     }
-
     SwitchContext(); //for some reason we get tb5 in both lists her
 
     // If the task remains blocked until its deadline is reached
-    if (PreviousTask->Deadline <= Ticks) {
+    if (deadline() <= Ticks) {
         isr_off();
         msg *expiredMsg = mailbox_remove_head(mBox);
         free(expiredMsg);
@@ -233,7 +232,8 @@ exception receive_wait(mailbox* mBox, void* pData) {
 
         if(mBox->nBlockedMsg > 0) {
             PreviousTask = NextTask;
-            list_insert_sort(ReadyList, receivedMsg->pBlock, cmp_tcb_priority);
+            listobj *node = list_unlink_node(WaitingList,receivedMsg->pBlock);
+            list_insert_sort(ReadyList, node, cmp_tcb_priority);
             NextTask = ReadyList->pHead->pTask;
             mBox->nBlockedMsg--;
         } else {
@@ -343,7 +343,7 @@ exception wait(uint nTicks) {
     NextTask = ReadyList->pHead->pTask;
     
     SwitchContext();
-    if (PreviousTask->Deadline <= ticks()) {
+    if (ticks() >= deadline()) {
         return DEADLINE_REACHED;
     }
     return OK;
@@ -374,7 +374,7 @@ void set_deadline(uint deadline) {
 
 void TimerInt(void) {
     Ticks++;
-    if (Ticks == 4000) {
+    if (Ticks == 1000) {
         asm("nop");
     }
     
